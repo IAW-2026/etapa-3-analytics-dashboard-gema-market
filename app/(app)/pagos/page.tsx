@@ -7,7 +7,7 @@ import { BarChartWidget } from "@/components/charts/BarChartWidget";
 import { LineChartWidget } from "@/components/charts/LineChartWidget";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { MetricCardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
-import { getPaymentsStats, getPaymentsTimeseries, type PaymentOrder } from "@/lib/services/payments";
+import { getPaymentsStats, getPaymentsTimeseries } from "@/lib/services/payments";
 import { formatCurrency, formatPercent, formatNumber } from "@/lib/aggregate";
 import { normalizeDateFrom, normalizeDateTo, defaultDateFrom, defaultDateTo } from "@/lib/dates";
 import { Badge } from "@/components/ui/Badge";
