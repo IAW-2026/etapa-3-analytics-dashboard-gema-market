@@ -10,8 +10,7 @@ export interface GlobalKPIs {
   activeUsers: number;
   approvalRate: number;
   deliveredShipments: number;
-  failedShipments: number;
-  shippingFailureRate: number;
+  onTimeRate: number;
   averageDeliveryHours: number;
   averageTicket: number;
   activeCatalogProducts: number;
@@ -35,9 +34,6 @@ export function buildKPIs(
   const shipping = shippingResult.status === "fulfilled" ? shippingResult.value : null;
 
   const deliveredShipments = shipping?.shipments_by_status.delivered ?? 0;
-  const failedShipments =
-    (shipping?.shipments_by_status.failed ?? 0) +
-    (shipping?.shipments_by_status.cancelled ?? 0);
 
   return {
     gmv: payments?.total_volume ?? 0,
@@ -46,8 +42,7 @@ export function buildKPIs(
     activeUsers,
     approvalRate: payments?.approval_rate ?? 0,
     deliveredShipments,
-    failedShipments,
-    shippingFailureRate: shipping?.failure_rate ?? 0,
+    onTimeRate: shipping?.on_time_rate ?? 0,
     averageDeliveryHours: shipping?.average_delivery_hours ?? 0,
     averageTicket: buyer?.average_ticket ?? 0,
     activeCatalogProducts: seller?.products_by_status.active ?? 0,

@@ -7,15 +7,13 @@ export type ShipmentStatus =
   | "pending_pickup"
   | "picked_up"
   | "in_transit"
-  | "delivered"
-  | "failed"
-  | "cancelled";
+  | "delivered";
 
 export interface ShippingStats {
   total_shipments: number;
   shipments_by_status: Record<ShipmentStatus, number>;
   average_delivery_hours: number;
-  failure_rate: number;
+  on_time_rate: number;
 }
 
 export interface ShippingTimeseries {

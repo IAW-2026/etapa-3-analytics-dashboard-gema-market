@@ -116,8 +116,9 @@ async function ResumenContent({ searchParams }: PageProps) {
             subtext={sellerResult.status === "rejected" ? "Seller no disponible" : undefined}
           />
           <MetricCard
-            label="Tasa de fallo envíos"
-            value={formatPercent(kpis.shippingFailureRate)}
+            label="Envíos en tiempo estimado"
+            value={formatPercent(kpis.onTimeRate)}
+            deltaPositive={kpis.onTimeRate > 0.90}
             subtext={shippingResult.status === "rejected" ? "Shipping no disponible" : undefined}
           />
         </div>

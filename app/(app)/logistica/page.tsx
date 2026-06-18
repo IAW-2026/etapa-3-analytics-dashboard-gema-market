@@ -24,8 +24,6 @@ const STATUS_LABEL: Record<string, string> = {
   picked_up: "Retirado",
   in_transit: "En tránsito",
   delivered: "Entregado",
-  failed: "Fallido",
-  cancelled: "Cancelado",
 };
 
 export default function LogisticaPage({ searchParams }: PageProps) {
@@ -56,7 +54,7 @@ async function LogisticaContent({ searchParams }: PageProps) {
 
   const delivered = stats?.shipments_by_status.delivered ?? 0;
   const avgHours = stats?.average_delivery_hours ?? 0;
-  const failureRate = stats?.failure_rate ?? 0;
+  const onTimeRate = stats?.on_time_rate ?? 0;
 
   const donutData = stats
     ? Object.entries(stats.shipments_by_status)
@@ -90,9 +88,9 @@ async function LogisticaContent({ searchParams }: PageProps) {
           subtext={statsResult.status === "rejected" ? "Shipping no disponible" : undefined}
         />
         <MetricCard
-          label="Tasa de fallo"
-          value={formatPercent(failureRate)}
-          deltaPositive={failureRate < 0.05}
+          label="Envíos en tiempo estimado"
+          value={formatPercent(onTimeRate)}
+          deltaPositive={onTimeRate > 0.90}
           subtext={statsResult.status === "rejected" ? "Shipping no disponible" : undefined}
         />
       </div>
