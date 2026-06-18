@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { BarChartWidget } from "@/components/charts/BarChartWidget";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { MetricCardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
@@ -116,6 +117,8 @@ async function CatalogoContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : statsResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Seller" />
           )}
@@ -143,8 +146,10 @@ async function CatalogoContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : statsResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
-            <ErrorState source="Seller" message="No hay datos de categorías disponibles." />
+            <ErrorState source="Seller" />
           )}
         </Card>
       </div>
@@ -155,12 +160,16 @@ async function CatalogoContent({ searchParams }: PageProps) {
           Productos con stock bajo (orden ascendente)
         </p>
         {lowStock ? (
-          <DataTable
-            columns={productColumns}
-            rows={lowStock.items.filter((p) => p.stock < 10)}
-            getKey={(r) => r.product_id}
-            caption="Productos con stock bajo"
-          />
+          lowStock.items.filter((p) => p.stock < 10).length > 0 ? (
+            <DataTable
+              columns={productColumns}
+              rows={lowStock.items.filter((p) => p.stock < 10)}
+              getKey={(r) => r.product_id}
+              caption="Productos con stock bajo"
+            />
+          ) : (
+            <EmptyState title="Stock suficiente" description="No hay productos con stock bajo en este momento." />
+          )
         ) : (
           <ErrorState source="Seller" />
         )}
