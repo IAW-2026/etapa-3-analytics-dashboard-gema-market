@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { BarChartWidget } from "@/components/charts/BarChartWidget";
 import { LineChartWidget } from "@/components/charts/LineChartWidget";
 import { DataTable, type Column } from "@/components/ui/DataTable";
@@ -121,6 +122,8 @@ async function PagosContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : statsResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Payments" />
           )}
@@ -149,6 +152,8 @@ async function PagosContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : timeseriesResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Payments timeseries" />
           )}

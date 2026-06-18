@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { BarChartWidget } from "@/components/charts/BarChartWidget";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { MetricCardSkeleton, ChartSkeleton } from "@/components/ui/Skeleton";
@@ -118,6 +119,8 @@ async function VentasContent({ searchParams }: PageProps) {
               />
             </details>
           </>
+        ) : buyerResult.status === "fulfilled" ? (
+          <EmptyState />
         ) : (
           <ErrorState source="Buyer" />
         )}
@@ -145,6 +148,8 @@ async function VentasContent({ searchParams }: PageProps) {
               className="mt-3"
             />
           </>
+        ) : sellerResult.status === "fulfilled" ? (
+          <EmptyState />
         ) : (
           <ErrorState source="Seller" />
         )}
@@ -156,12 +161,16 @@ async function VentasContent({ searchParams }: PageProps) {
           Últimas ventas {ventas?.total ? `(${formatNumber(ventas.total)} total)` : ""}
         </p>
         {ventas ? (
-          <DataTable
-            columns={ventaColumns}
-            rows={ventas.items}
-            getKey={(r) => r.venta_id}
-            caption="Últimas ventas"
-          />
+          ventas.items.length > 0 ? (
+            <DataTable
+              columns={ventaColumns}
+              rows={ventas.items}
+              getKey={(r) => r.venta_id}
+              caption="Últimas ventas"
+            />
+          ) : (
+            <EmptyState />
+          )
         ) : (
           <ErrorState source="Seller" />
         )}

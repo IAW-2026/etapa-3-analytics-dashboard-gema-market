@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { DonutChartWidget } from "@/components/charts/DonutChartWidget";
 import { LineChartWidget } from "@/components/charts/LineChartWidget";
 import { DataTable } from "@/components/ui/DataTable";
@@ -118,6 +119,8 @@ async function LogisticaContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : statsResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Shipping" />
           )}
@@ -144,6 +147,8 @@ async function LogisticaContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : timeseriesResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Shipping timeseries" />
           )}

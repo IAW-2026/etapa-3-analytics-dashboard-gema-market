@@ -3,6 +3,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { DonutChartWidget } from "@/components/charts/DonutChartWidget";
 import { BarChartWidget } from "@/components/charts/BarChartWidget";
 import { DataTable, type Column } from "@/components/ui/DataTable";
@@ -145,6 +146,8 @@ async function ResumenContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : buyerResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Buyer" />
           )}
@@ -171,6 +174,8 @@ async function ResumenContent({ searchParams }: PageProps) {
                 />
               </details>
             </>
+          ) : paymentsResult.status === "fulfilled" ? (
+            <EmptyState />
           ) : (
             <ErrorState source="Payments" />
           )}
