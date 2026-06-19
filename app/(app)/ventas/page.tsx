@@ -12,9 +12,17 @@ import { getSellerStats, getVentas, type Venta } from "@/lib/services/seller";
 import { formatCurrency, formatNumber } from "@/lib/aggregate";
 import { normalizeDateFrom, normalizeDateTo } from "@/lib/dates";
 import { Badge } from "@/components/ui/Badge";
+import { Pagination } from "@/components/ui/Pagination";
+import { PageSizeSelect } from "@/components/ui/PageSizeSelect";
+import { parsePageParams } from "@/lib/pagination";
 
 interface PageProps {
-  searchParams: Promise<{ date_from?: string; date_to?: string }>;
+  searchParams: Promise<{
+    date_from?: string;
+    date_to?: string;
+    page?: string;
+    page_size?: string;
+  }>;
 }
 
 export const metadata = { title: "Ventas" };
@@ -38,15 +46,25 @@ const STATUS_VARIANT: Record<string, "success" | "warn" | "danger" | "muted"> = 
 };
 
 async function VentasContent({ searchParams }: PageProps) {
-  const { date_from, date_to } = await searchParams;
+  const { date_from, date_to, page: pageParam, page_size: pageSizeParam } = await searchParams;
   const dateFrom = normalizeDateFrom(date_from);
   const dateTo = normalizeDateTo(date_to);
+  const { page, pageSize } = parsePageParams({ page: pageParam, page_size: pageSizeParam });
 
   const [buyerResult, sellerResult, ventasResult] = await Promise.allSettled([
     getBuyerStats(dateFrom, dateTo),
     getSellerStats(dateFrom, dateTo),
-    getVentas(1, 20, dateFrom, dateTo),
+    getVentas(page, pageSize, dateFrom, dateTo),
   ]);
+
+  function buildHref(targetPage: number) {
+    const p = new URLSearchParams();
+    if (date_from) p.set("date_from", date_from);
+    if (date_to) p.set("date_to", date_to);
+    p.set("page_size", String(pageSize));
+    p.set("page", String(targetPage));
+    return `/ventas?${p.toString()}`;
+  }
 
   const buyer = buyerResult.status === "fulfilled" ? buyerResult.value : null;
   const seller = sellerResult.status === "fulfilled" ? sellerResult.value : null;
@@ -162,12 +180,17 @@ async function VentasContent({ searchParams }: PageProps) {
         </p>
         {ventas ? (
           ventas.items.length > 0 ? (
-            <DataTable
-              columns={ventaColumns}
-              rows={ventas.items}
-              getKey={(r) => r.venta_id}
-              caption="Últimas ventas"
-            />
+            <>
+              <DataTable
+                columns={ventaColumns}
+                rows={ventas.items}
+                getKey={(r) => r.venta_id}
+                caption="Últimas ventas"
+              />
+              <Pagination page={page} pageSize={pageSize} total={ventas.total} buildHref={buildHref}>
+                <PageSizeSelect pageSize={pageSize} />
+              </Pagination>
+            </>
           ) : (
             <EmptyState />
           )

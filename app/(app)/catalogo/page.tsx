@@ -11,9 +11,17 @@ import { getSellerStats, getProductos, type Producto } from "@/lib/services/sell
 import { formatCurrency, formatNumber } from "@/lib/aggregate";
 import { normalizeDateFrom, normalizeDateTo } from "@/lib/dates";
 import { Badge } from "@/components/ui/Badge";
+import { Pagination } from "@/components/ui/Pagination";
+import { PageSizeSelect } from "@/components/ui/PageSizeSelect";
+import { parsePageParams } from "@/lib/pagination";
 
 interface PageProps {
-  searchParams: Promise<{ date_from?: string; date_to?: string }>;
+  searchParams: Promise<{
+    date_from?: string;
+    date_to?: string;
+    page?: string;
+    page_size?: string;
+  }>;
 }
 
 export const metadata = { title: "Catálogo" };
@@ -30,17 +38,27 @@ export default function CatalogoPage({ searchParams }: PageProps) {
 }
 
 async function CatalogoContent({ searchParams }: PageProps) {
-  const { date_from, date_to } = await searchParams;
+  const { date_from, date_to, page: pageParam, page_size: pageSizeParam } = await searchParams;
   const dateFrom = normalizeDateFrom(date_from);
   const dateTo = normalizeDateTo(date_to);
+  const { page, pageSize } = parsePageParams({ page: pageParam, page_size: pageSizeParam });
 
-  const [statsResult, lowStockResult] = await Promise.allSettled([
+  const [statsResult, productosResult] = await Promise.allSettled([
     getSellerStats(dateFrom, dateTo),
-    getProductos(1, 20, "stock", "asc"),
+    getProductos(page, pageSize, "stock", "asc"),
   ]);
 
   const stats = statsResult.status === "fulfilled" ? statsResult.value : null;
-  const lowStock = lowStockResult.status === "fulfilled" ? lowStockResult.value : null;
+  const productos = productosResult.status === "fulfilled" ? productosResult.value : null;
+
+  function buildHref(targetPage: number) {
+    const p = new URLSearchParams();
+    if (date_from) p.set("date_from", date_from);
+    if (date_to) p.set("date_to", date_to);
+    p.set("page_size", String(pageSize));
+    p.set("page", String(targetPage));
+    return `/catalogo?${p.toString()}`;
+  }
 
   const statusBarData = stats
     ? [
@@ -154,21 +172,26 @@ async function CatalogoContent({ searchParams }: PageProps) {
         </Card>
       </div>
 
-      {/* Stock bajo */}
+      {/* Catálogo de productos */}
       <Card>
         <p className="text-xs font-mono text-ink-3 uppercase tracking-wide mb-3">
-          Productos con stock bajo (orden ascendente)
+          Catálogo de productos
         </p>
-        {lowStock ? (
-          lowStock.items.filter((p) => p.stock < 10).length > 0 ? (
-            <DataTable
-              columns={productColumns}
-              rows={lowStock.items.filter((p) => p.stock < 10)}
-              getKey={(r) => r.product_id}
-              caption="Productos con stock bajo"
-            />
+        {productos ? (
+          productos.items.length > 0 ? (
+            <>
+              <DataTable
+                columns={productColumns}
+                rows={productos.items}
+                getKey={(r) => r.product_id}
+                caption="Catálogo de productos"
+              />
+              <Pagination page={page} pageSize={pageSize} total={productos.total} buildHref={buildHref}>
+                <PageSizeSelect pageSize={pageSize} />
+              </Pagination>
+            </>
           ) : (
-            <EmptyState title="Stock suficiente" description="No hay productos con stock bajo en este momento." />
+            <EmptyState />
           )
         ) : (
           <ErrorState source="Seller" />
